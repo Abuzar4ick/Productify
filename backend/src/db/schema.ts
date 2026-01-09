@@ -7,7 +7,10 @@ export const users = pgTable("users", {
   name: text("name"),
   imageUrl: text("image_url"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const products = pgTable("products", {
@@ -45,8 +48,11 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 }));
 
 export const commentsRelations = relations(comments, ({ one }) => ({
-    user: one(users, { fields: [comments.userId], references: [users.id] }), // One comment -> one user
-    product: one(products, { fields: [comments.productId], references: [products.id] }), // One comment -> one product
+  user: one(users, { fields: [comments.userId], references: [users.id] }), // One comment -> one user
+  product: one(products, {
+    fields: [comments.productId],
+    references: [products.id],
+  }), // One comment -> one product
 }));
 
 // Type inference
